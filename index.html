@@ -1,19 +1,52 @@
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자산 증식 릴레이 전략</title>
 <style>
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f0;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6b6b;
+    --border-tertiary: rgba(0,0,0,0.12);
+    --border-secondary: rgba(0,0,0,0.2);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2a2a28;
+      --text-primary: #e8e6de;
+      --text-secondary: #9c9a92;
+      --border-tertiary: rgba(255,255,255,0.12);
+      --border-secondary: rgba(255,255,255,0.2);
+    }
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: var(--font-sans); color: var(--color-text-primary); }
-  .stage-label { font-size:13px; font-weight:500; color:var(--color-text-secondary); letter-spacing:0.5px; margin-bottom:8px; }
+  body { font-family: var(--font-sans); color: var(--text-primary); background: var(--bg-secondary); padding: 2rem; line-height: 1.5; }
+  .container { max-width: 680px; margin: 0 auto; background: var(--bg-primary); border-radius: var(--radius-lg); padding: 2rem; border: 0.5px solid var(--border-tertiary); }
+  .stage-label { font-size:13px; font-weight:500; color:var(--text-secondary); letter-spacing:0.5px; margin-bottom:8px; }
   .stage-title { font-size:18px; font-weight:500; margin-bottom:4px; }
-  .stage-desc { font-size:13px; color:var(--color-text-secondary); margin-bottom:20px; line-height:1.5; }
+  .stage-desc { font-size:13px; color:var(--text-secondary); margin-bottom:20px; line-height:1.5; }
   .relay-track { position:relative; padding-left:32px; }
-  .relay-item { position:relative; padding:16px 20px; border-radius:var(--border-radius-lg); margin-bottom:12px; cursor:pointer; transition: transform 0.15s; border:0.5px solid transparent; }
-  .relay-item:hover { transform:translateX(4px); }
+  .relay-item { position:relative; padding:16px 20px; border-radius:var(--radius-lg); margin-bottom:12px; border:0.5px solid transparent; }
   .relay-item::before { content:''; position:absolute; left:-24px; top:50%; width:12px; height:12px; border-radius:50%; transform:translateY(-50%); border:2px solid; }
   .relay-line { position:absolute; left:-18px; top:0; bottom:0; width:0.5px; }
-  .item-tag { font-size:11px; font-weight:500; padding:2px 8px; border-radius:var(--border-radius-md); display:inline-block; margin-bottom:6px; }
+  .item-tag { font-size:11px; font-weight:500; padding:2px 8px; border-radius:var(--radius-md); display:inline-block; margin-bottom:6px; }
   .item-title { font-size:15px; font-weight:500; margin-bottom:4px; }
   .item-desc { font-size:13px; line-height:1.5; }
   .item-detail { font-size:12px; margin-top:8px; padding-top:8px; line-height:1.6; }
+  .arrow-between { text-align:center; padding:4px 0; margin-left:32px; }
+  .divider { height:0.5px; background:var(--border-tertiary); margin:28px 0; }
+  .rule-card { padding:16px 20px; border-radius:var(--radius-lg); margin-bottom:12px; border:0.5px solid; }
+  .rule-num { font-size:11px; font-weight:500; padding:2px 8px; border-radius:var(--radius-md); display:inline-block; margin-bottom:8px; }
+  .rule-title { font-size:14px; font-weight:500; margin-bottom:6px; }
+  .rule-body { font-size:13px; line-height:1.6; }
+  .rule-highlight { font-weight:500; }
 
   .r1 { background:#E6F1FB; } .r1::before { border-color:#185FA5; background:#85B7EB; }
   .r1 .item-tag { background:#B5D4F4; color:#0C447C; }
@@ -38,17 +71,6 @@
   .r4 .item-title { color:#444441; }
   .r4 .item-desc { color:#5F5E5A; }
   .r4 .item-detail { color:#5F5E5A; border-top:0.5px solid #B4B2A9; }
-
-  .arrow-between { text-align:center; padding:4px 0; margin-left:32px; }
-  .arrow-between svg { display:inline-block; }
-
-  .divider { height:0.5px; background:var(--color-border-tertiary); margin:28px 0; }
-
-  .rule-card { padding:16px 20px; border-radius:var(--border-radius-lg); margin-bottom:12px; border:0.5px solid; }
-  .rule-num { font-size:11px; font-weight:500; padding:2px 8px; border-radius:var(--border-radius-md); display:inline-block; margin-bottom:8px; }
-  .rule-title { font-size:14px; font-weight:500; margin-bottom:6px; }
-  .rule-body { font-size:13px; line-height:1.6; }
-  .rule-highlight { font-weight:500; }
 
   .rc1 { background:#EEEDFE; border-color:#AFA9EC; }
   .rc1 .rule-num { background:#CECBF6; color:#3C3489; }
@@ -106,16 +128,17 @@
     .rc3 .rule-body { color:#FAC775; }
   }
 </style>
-
-<div style="padding:0.5rem 0;">
+</head>
+<body>
+<div class="container">
   <div class="stage-label">1단계</div>
   <div class="stage-title">계좌별 자산 증식 릴레이</div>
   <div class="stage-desc">목표 달성 후 다음 계좌로 화력을 옮기는 순차 집중 전략</div>
 
   <div class="relay-track">
-    <div class="relay-line" style="background:var(--color-border-secondary);"></div>
+    <div class="relay-line" style="background:var(--border-secondary);"></div>
 
-    <div class="relay-item r1" onclick="sendPrompt('연금저축 S&P500, 나스닥100, 미국배당다우존스 비중을 어떻게 나누면 좋을까요?')">
+    <div class="relay-item r1">
       <span class="item-tag">고정 유지</span>
       <div class="item-title">연금저축</div>
       <div class="item-desc">월 50만 원 고정 납입</div>
@@ -123,10 +146,10 @@
     </div>
 
     <div class="arrow-between">
-      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--color-text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
 
-    <div class="relay-item r2" onclick="sendPrompt('해외직투 3,000만 원 달성 후 매년 250만 원 익절 전략을 더 자세히 알려주세요')">
+    <div class="relay-item r2">
       <span class="item-tag">최우선 돌파</span>
       <div class="item-title">해외직투 계좌</div>
       <div class="item-desc">목표 3,000만 원까지 가용 자금 전액 투입</div>
@@ -134,10 +157,10 @@
     </div>
 
     <div class="arrow-between">
-      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--color-text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
 
-    <div class="relay-item r3" onclick="sendPrompt('ISA 계좌 연 2,000만 원 한도를 채우려면 월 얼마씩 넣어야 하나요?')">
+    <div class="relay-item r3">
       <span class="item-tag">화력 이동</span>
       <div class="item-title">ISA 계좌</div>
       <div class="item-desc">해외직투 완성 후 잉여 현금 전액 전환</div>
@@ -145,10 +168,10 @@
     </div>
 
     <div class="arrow-between">
-      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--color-text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
 
-    <div class="relay-item r4" onclick="sendPrompt('소방공제회 납입금 증액은 언제 어느 수준으로 하는 게 좋을까요?')">
+    <div class="relay-item r4">
       <span class="item-tag">최후 방어력 강화</span>
       <div class="item-title">소방공제회 증액</div>
       <div class="item-desc">ISA 한도를 채울 수 있을 때 비로소 증액</div>
@@ -189,3 +212,5 @@
     </div>
   </div>
 </div>
+</body>
+</html>
