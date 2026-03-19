@@ -1,0 +1,191 @@
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); }
+  .stage-label { font-size:13px; font-weight:500; color:var(--color-text-secondary); letter-spacing:0.5px; margin-bottom:8px; }
+  .stage-title { font-size:18px; font-weight:500; margin-bottom:4px; }
+  .stage-desc { font-size:13px; color:var(--color-text-secondary); margin-bottom:20px; line-height:1.5; }
+  .relay-track { position:relative; padding-left:32px; }
+  .relay-item { position:relative; padding:16px 20px; border-radius:var(--border-radius-lg); margin-bottom:12px; cursor:pointer; transition: transform 0.15s; border:0.5px solid transparent; }
+  .relay-item:hover { transform:translateX(4px); }
+  .relay-item::before { content:''; position:absolute; left:-24px; top:50%; width:12px; height:12px; border-radius:50%; transform:translateY(-50%); border:2px solid; }
+  .relay-line { position:absolute; left:-18px; top:0; bottom:0; width:0.5px; }
+  .item-tag { font-size:11px; font-weight:500; padding:2px 8px; border-radius:var(--border-radius-md); display:inline-block; margin-bottom:6px; }
+  .item-title { font-size:15px; font-weight:500; margin-bottom:4px; }
+  .item-desc { font-size:13px; line-height:1.5; }
+  .item-detail { font-size:12px; margin-top:8px; padding-top:8px; line-height:1.6; }
+
+  .r1 { background:#E6F1FB; } .r1::before { border-color:#185FA5; background:#85B7EB; }
+  .r1 .item-tag { background:#B5D4F4; color:#0C447C; }
+  .r1 .item-title { color:#0C447C; }
+  .r1 .item-desc { color:#185FA5; }
+  .r1 .item-detail { color:#185FA5; border-top:0.5px solid #85B7EB; }
+
+  .r2 { background:#FAECE7; } .r2::before { border-color:#993C1D; background:#F0997B; }
+  .r2 .item-tag { background:#F5C4B3; color:#712B13; }
+  .r2 .item-title { color:#712B13; }
+  .r2 .item-desc { color:#993C1D; }
+  .r2 .item-detail { color:#993C1D; border-top:0.5px solid #F0997B; }
+
+  .r3 { background:#E1F5EE; } .r3::before { border-color:#0F6E56; background:#5DCAA5; }
+  .r3 .item-tag { background:#9FE1CB; color:#085041; }
+  .r3 .item-title { color:#085041; }
+  .r3 .item-desc { color:#0F6E56; }
+  .r3 .item-detail { color:#0F6E56; border-top:0.5px solid #5DCAA5; }
+
+  .r4 { background:#F1EFE8; } .r4::before { border-color:#5F5E5A; background:#B4B2A9; }
+  .r4 .item-tag { background:#D3D1C7; color:#444441; }
+  .r4 .item-title { color:#444441; }
+  .r4 .item-desc { color:#5F5E5A; }
+  .r4 .item-detail { color:#5F5E5A; border-top:0.5px solid #B4B2A9; }
+
+  .arrow-between { text-align:center; padding:4px 0; margin-left:32px; }
+  .arrow-between svg { display:inline-block; }
+
+  .divider { height:0.5px; background:var(--color-border-tertiary); margin:28px 0; }
+
+  .rule-card { padding:16px 20px; border-radius:var(--border-radius-lg); margin-bottom:12px; border:0.5px solid; }
+  .rule-num { font-size:11px; font-weight:500; padding:2px 8px; border-radius:var(--border-radius-md); display:inline-block; margin-bottom:8px; }
+  .rule-title { font-size:14px; font-weight:500; margin-bottom:6px; }
+  .rule-body { font-size:13px; line-height:1.6; }
+  .rule-highlight { font-weight:500; }
+
+  .rc1 { background:#EEEDFE; border-color:#AFA9EC; }
+  .rc1 .rule-num { background:#CECBF6; color:#3C3489; }
+  .rc1 .rule-title { color:#3C3489; }
+  .rc1 .rule-body { color:#534AB7; }
+
+  .rc2 { background:#FBEAF0; border-color:#ED93B1; }
+  .rc2 .rule-num { background:#F4C0D1; color:#72243E; }
+  .rc2 .rule-title { color:#72243E; }
+  .rc2 .rule-body { color:#993556; }
+
+  .rc3 { background:#FAEEDA; border-color:#FAC775; }
+  .rc3 .rule-num { background:#FAC775; color:#633806; }
+  .rc3 .rule-title { color:#633806; }
+  .rc3 .rule-body { color:#854F0B; }
+
+  @media (prefers-color-scheme: dark) {
+    .r1 { background:#042C53; } .r1::before { background:#378ADD; border-color:#85B7EB; }
+    .r1 .item-tag { background:#185FA5; color:#B5D4F4; }
+    .r1 .item-title { color:#B5D4F4; }
+    .r1 .item-desc { color:#85B7EB; }
+    .r1 .item-detail { color:#85B7EB; border-top-color:#185FA5; }
+
+    .r2 { background:#4A1B0C; } .r2::before { background:#D85A30; border-color:#F0997B; }
+    .r2 .item-tag { background:#993C1D; color:#F5C4B3; }
+    .r2 .item-title { color:#F5C4B3; }
+    .r2 .item-desc { color:#F0997B; }
+    .r2 .item-detail { color:#F0997B; border-top-color:#993C1D; }
+
+    .r3 { background:#04342C; } .r3::before { background:#1D9E75; border-color:#5DCAA5; }
+    .r3 .item-tag { background:#0F6E56; color:#9FE1CB; }
+    .r3 .item-title { color:#9FE1CB; }
+    .r3 .item-desc { color:#5DCAA5; }
+    .r3 .item-detail { color:#5DCAA5; border-top-color:#0F6E56; }
+
+    .r4 { background:#2C2C2A; } .r4::before { background:#888780; border-color:#B4B2A9; }
+    .r4 .item-tag { background:#5F5E5A; color:#D3D1C7; }
+    .r4 .item-title { color:#D3D1C7; }
+    .r4 .item-desc { color:#B4B2A9; }
+    .r4 .item-detail { color:#B4B2A9; border-top-color:#5F5E5A; }
+
+    .rc1 { background:#26215C; border-color:#7F77DD; }
+    .rc1 .rule-num { background:#534AB7; color:#CECBF6; }
+    .rc1 .rule-title { color:#CECBF6; }
+    .rc1 .rule-body { color:#AFA9EC; }
+
+    .rc2 { background:#4B1528; border-color:#D4537E; }
+    .rc2 .rule-num { background:#993556; color:#F4C0D1; }
+    .rc2 .rule-title { color:#F4C0D1; }
+    .rc2 .rule-body { color:#ED93B1; }
+
+    .rc3 { background:#412402; border-color:#BA7517; }
+    .rc3 .rule-num { background:#854F0B; color:#FAC775; }
+    .rc3 .rule-title { color:#FAC775; }
+    .rc3 .rule-body { color:#FAC775; }
+  }
+</style>
+
+<div style="padding:0.5rem 0;">
+  <div class="stage-label">1단계</div>
+  <div class="stage-title">계좌별 자산 증식 릴레이</div>
+  <div class="stage-desc">목표 달성 후 다음 계좌로 화력을 옮기는 순차 집중 전략</div>
+
+  <div class="relay-track">
+    <div class="relay-line" style="background:var(--color-border-secondary);"></div>
+
+    <div class="relay-item r1" onclick="sendPrompt('연금저축 S&P500, 나스닥100, 미국배당다우존스 비중을 어떻게 나누면 좋을까요?')">
+      <span class="item-tag">고정 유지</span>
+      <div class="item-title">연금저축</div>
+      <div class="item-desc">월 50만 원 고정 납입</div>
+      <div class="item-detail">S&P500 + 나스닥100 + 미국배당다우존스 세팅<br>연말정산 환급금 창출 & 노후 대비</div>
+    </div>
+
+    <div class="arrow-between">
+      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--color-text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="relay-item r2" onclick="sendPrompt('해외직투 3,000만 원 달성 후 매년 250만 원 익절 전략을 더 자세히 알려주세요')">
+      <span class="item-tag">최우선 돌파</span>
+      <div class="item-title">해외직투 계좌</div>
+      <div class="item-desc">목표 3,000만 원까지 가용 자금 전액 투입</div>
+      <div class="item-detail">3,000만 원 달성 시 추가 입금 즉시 중단<br>이후 매년 250만 원 비과세 익절 + 재매수</div>
+    </div>
+
+    <div class="arrow-between">
+      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--color-text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="relay-item r3" onclick="sendPrompt('ISA 계좌 연 2,000만 원 한도를 채우려면 월 얼마씩 넣어야 하나요?')">
+      <span class="item-tag">화력 이동</span>
+      <div class="item-title">ISA 계좌</div>
+      <div class="item-desc">해외직투 완성 후 잉여 현금 전액 전환</div>
+      <div class="item-detail">연 2,000만 원 한도 목표 (월 166만 원)<br>비과세 자산 증식 본격 시작</div>
+    </div>
+
+    <div class="arrow-between">
+      <svg width="24" height="28" viewBox="0 0 24 28"><path d="M12 4V22M7 17L12 22L17 17" stroke="var(--color-text-secondary)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="relay-item r4" onclick="sendPrompt('소방공제회 납입금 증액은 언제 어느 수준으로 하는 게 좋을까요?')">
+      <span class="item-tag">최후 방어력 강화</span>
+      <div class="item-title">소방공제회 증액</div>
+      <div class="item-desc">ISA 한도를 채울 수 있을 때 비로소 증액</div>
+      <div class="item-detail">현금 흐름이 충분해진 후 안전자산 덩치 확대</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stage-label">2단계</div>
+  <div class="stage-title">매년 실행할 비과세 엑시트 룰</div>
+  <div class="stage-desc">세금을 합법적으로 0원으로 만들고 자산을 영구적으로 불리는 핵심 규칙</div>
+
+  <div class="rule-card rc1">
+    <span class="rule-num">룰 1</span>
+    <div class="rule-title">해외직투 비과세 익절</div>
+    <div class="rule-body">
+      3,000만 원 세팅 이후, 매년 말 수익금 <span class="rule-highlight">250만 원</span>만 익절 후 즉시 재매수<br>
+      평가금액 유지 + 세금 0원 초기화
+    </div>
+  </div>
+
+  <div class="rule-card rc2">
+    <span class="rule-num">룰 2</span>
+    <div class="rule-title">ISA 만기 연계</div>
+    <div class="rule-body">
+      ISA 만기 시 <span class="rule-highlight">300만 원</span>을 연금저축으로 추가 납입<br>
+      추가 세액공제 혜택 확보
+    </div>
+  </div>
+
+  <div class="rule-card rc3">
+    <span class="rule-num">룰 3</span>
+    <div class="rule-title">코인 비과세 익절</div>
+    <div class="rule-body">
+      비트코인/이더리움 수익 발생 시 연 <span class="rule-highlight">250만 원</span> 한도 내 수익 실현<br>
+      실현 현금은 소방공제회 증액 또는 CMA 잔고 보충에 사용
+    </div>
+  </div>
+</div>
