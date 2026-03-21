@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>동훈 나경 가족 투자 통합 대시보드</title>
+<title>신 가족 투자 통합 대시보드</title>
 <style>
 :root{--bg:#0c0e14;--card:#141720;--border:rgba(255,255,255,.06);--text:#e4e4ef;--sub:#8a8fa6;--dim:#555;--g:#10B981;--r:#EF4444;--b:#3B82F6;--y:#F59E0B;--p:#8B5CF6;--cyan:#22D3EE}
 *{margin:0;padding:0;box-sizing:border-box}html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
@@ -203,11 +203,12 @@ function render(){
     h+='<div class="cd"><table class="tbl"><tr><th>\uACC4\uC88C</th><th style="text-align:right">\uD3C9\uAC00\uC561</th><th style="text-align:right">\uC190\uC775</th><th style="text-align:right">\uC218\uC775\uB960</th></tr>';
     d.bA.filter(function(a){return a.value>0}).forEach(function(a){h+='<tr><td><span style="color:'+a.color+'">\u25CF</span> '+a.name+'('+a.owner+')</td><td style="text-align:right;font-weight:600">\u20A9'+fS(a.value)+'</td><td style="text-align:right;color:'+(a.gain>=0?'var(--g)':'var(--r)')+'">'+(a.gain>=0?'+':'')+'\u20A9'+fS(Math.abs(a.gain))+'</td><td style="text-align:right">'+rH(a.pct,10)+'</td></tr>'});
     h+='</table></div>';
-    /* Returns bars */
-    h+='<div class="cd"><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px">\uC885\uBAA9\uBCC4 \uC218\uC775\uB960</div>';
-    var mx=Math.max.apply(null,d.tk.map(function(t){return Math.abs(t.pct)}))||1;
-    d.tk.forEach(function(t){var w=Math.min(Math.abs(t.pct)/mx*100,100),cl=t.pct>=0?'var(--g)':'var(--r)';h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px"><div style="width:80px;font-size:8px;color:#aaa;text-align:right;flex-shrink:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">'+t.name+'</div><div style="flex:1;height:12px;background:rgba(255,255,255,.03);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+cl+';border-radius:3px"></div></div><div style="width:45px;font-size:9px;font-weight:700;color:'+cl+';text-align:right;flex-shrink:0">'+(t.pct>=0?'+':'')+t.pct.toFixed(1)+'%</div></div>'});
-    h+='</div>';
+    /* Holdings table */
+    h+='<div class="cd"><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px">\uC885\uBAA9\uBCC4 \uBCF4\uC720 \uD604\uD669</div>';
+    h+='<table class="tbl"><tr><th>\uC885\uBAA9</th><th style="text-align:right">\uC218\uB7C9</th><th style="text-align:right">\uD3C9\uAC00\uC561</th><th style="text-align:right">\uBE44\uC911</th><th style="text-align:right">\uC218\uC775\uB960</th></tr>';
+    d.tk.forEach(function(t){var cl=t.pct>=0?'var(--g)':'var(--r)';var totalQty=0;t.ac.forEach(function(a){totalQty+=a.qty});
+      h+='<tr><td style="font-weight:600">'+t.name+'</td><td style="text-align:right">'+qF(totalQty)+'</td><td style="text-align:right;font-weight:600">\u20A9'+fS(t.tV)+'</td><td style="text-align:right;color:var(--sub)">'+(d.tV>0?(t.tV/d.tV*100).toFixed(1):0)+'%</td><td style="text-align:right;color:'+cl+'">'+(t.pct>=0?'+':'')+t.pct.toFixed(1)+'%</td></tr>'});
+    h+='</table></div>';
     /* Signal summary */
     var sigs=getSignals(),sN=0,bN=0,tR=0;sigs.forEach(function(s){if(s.type==="strong")sN++;if(s.type==="buy")bN++;tR+=s.rec});
     h+='<div class="cd ck" onclick="sV(\'signal\')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:10px;font-weight:700;color:var(--sub)">\uD83C\uDFAF \uB9E4\uC218\uC2E0\uD638</div><span style="color:var(--g);font-weight:700;font-size:12px">'+sN+' \uAC15\uB825</span> \u00B7 <span style="color:var(--y);font-weight:700;font-size:12px">'+bN+' \uB9E4\uC218</span> \u00B7 \uAD8C\uC7A5 \u20A9'+fS(tR)+'</div><div style="color:var(--sub)">\u2192</div></div></div>';
@@ -229,7 +230,7 @@ function render(){
     h+=gaugeHTML('\uD83D\uDFE2 ISA \uB0A8\uD3B8 (\uC5F0\uAC04 2,000\uB9CC)',cont.isa_h,CONT_LIMITS.isa_h,'#10B981');
     h+=gaugeHTML('\uD83D\uDFE0 ISA \uC544\uB0B4 (\uC5F0\uAC04 2,000\uB9CC)',cont.isa_w,CONT_LIMITS.isa_w,'#F97316');
     h+='<button class="bp" onclick="oCont()" style="margin-top:6px;background:rgba(255,255,255,.05);color:var(--sub);border:1px solid var(--border)">\uD83D\uDCDD \uB0A9\uC785\uC561 \uC5C5\uB370\uC774\uD2B8</button></div>';
-    h+='<div class="cd"><div style="font-size:10px;color:var(--sub);margin-top:4px;line-height:1.6">\uD83D\uDCA1 \uACF5\uBB34\uC6D0 \uBD80\uBD80 TIP: \uC5F0\uAE08\uC800\uCD95 \uAC01 400\uB9CC\uC6D0(\uCD1D 800\uB9CC) \u00D7 16.5% \uACF5\uC81C \u2192 \uC5F0\uAC04 \uCD5C\uB300 132\uB9CC\uC6D0 \uC808\uC138</div></div>';
+    h+='<div class="cd"><div style="font-size:10px;color:var(--sub);margin-top:4px;line-height:1.6">\uD83D\uDCA1 \uACF5\uBB34\uC6D0 \uBD80\uBD80 TIP: \uC5F0\uAE08\uC800\uCD95 \uAC01 600\uB9CC\uC6D0(\uCD1D 1,200\uB9CC) \u00D7 16.5% \uACF5\uC81C \u2192 \uC5F0\uAC04 \uCD5C\uB300 198\uB9CC\uC6D0 \uC808\uC138 (5,500\uB9CC\uC6D0 \uC774\uD558 \uAE09\uC5EC \uAE30\uC900)</div></div>';
   }
 
   /* ═══ SIGNAL ═══ */
